@@ -22,6 +22,11 @@ from eth_utils import (
     int_to_big_endian,
     big_endian_to_int,
 )
+from eth_keys.utils.padding import pad32
+
+from ..native.jacobian import (
+    fast_multiply
+)
 
 
 # Modular inverse
@@ -192,8 +197,8 @@ def add_extended(p, q):
     return (_E * _F % Q, _G * _H % Q, _E * _H % Q, _F * _G % Q)
 
 
-def fast_multiply(p, n):
-    return from_extended(multiply(to_extended(p), n, adder=add_extended))
+# def fast_multiply(p, n):
+#     return from_extended(multiply(to_extended(p), n, adder=add_extended))
 
 
 def blake2b(msg_hash: bytes) -> bytes:
@@ -206,6 +211,13 @@ def encode_raw_public_key(raw_public_key: Tuple[int, int]) -> bytes:
     if left > Q - left:
         right |= 2**255
     return int_to_big_endian(right)
+
+# def encode_raw_public_key(raw_public_key: Tuple[int, int]) -> bytes:
+#     left, right = raw_public_key
+#     return b''.join((
+#         pad32(int_to_big_endian(left)),
+#         pad32(int_to_big_endian(right)),
+#     ))
 
 
 def x_from_y(y):
@@ -227,10 +239,13 @@ def decode_public_key(public_key_bytes: bytes) -> Tuple[int, int]:
 
 
 def privtopub(k):
-    h = blake2b(k)
-    a = 2 ** (BITS - 2) + (big_endian_to_int(h[:32]) % 2 ** (BITS - 2))
+    # h = blake2b(k)
+    a = 2 ** (BITS - 2) + (big_endian_to_int(k[:32]) % 2 ** (BITS - 2))
     a -= (a % 8)
-    return fast_multiply(B, a)
+    temp = fast_multiply(B, a)
+    print('MULTIPLY RESULT: ')
+    print(temp)
+    return temp
 
 
 # Signature algorithm
@@ -267,5 +282,8 @@ def ecdsa_raw_sign(msg_hash: bytes,
     raise Exception("Not Implemented")
 
 
-def private_key_to_public_key(*args, **kwargs):
-    raise Exception("Not Implemented")
+def private_key_to_public_key(private_key_bytes: bytes) -> bytes:
+    raw_public_key = privtopub(private_key_bytes)
+    public_key_bytes = encode_raw_public_key(raw_public_key)
+    print(public_key_bytes)
+    return public_key_bytes

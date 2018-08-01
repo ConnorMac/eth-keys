@@ -20,7 +20,8 @@ def get_default_backend_class() -> str:
     if is_coincurve_available():
         return 'eth_keys.backends.CoinCurveECCBackend'
     else:
-        return 'eth_keys.backends.NativeECCBackend'
+        # using ed25519 as new default
+        return 'eth_keys.backends.TwistedEdwardsECCBackend'
 
 
 def get_backend_class(import_path: str=None) -> Type[BaseECCBackend]:

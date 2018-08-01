@@ -60,14 +60,14 @@ def validate_message_hash(value: Any) -> None:
 
 def validate_public_key_bytes(value: Any) -> None:
     validate_bytes(value)
-    if len(value) != 64:
+    if len(value) != 32:
         raise ValidationError("Unexpected public key format.  Must be length 64 byte string")
 
 
 def validate_private_key_bytes(value: Any) -> None:
     validate_bytes(value)
-    if len(value) != 32:
-        raise ValidationError("Unexpected private key format.  Must be length 32 byte string")
+    if len(value) != 64:
+        raise ValidationError("Unexpected private key format.  Must be length 64 byte string")
 
 
 def validate_signature_bytes(value: Any) -> None:

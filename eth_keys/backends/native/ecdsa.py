@@ -50,6 +50,7 @@ def encode_raw_public_key(raw_public_key: Tuple[int, int]) -> bytes:
 
 
 def private_key_to_public_key(private_key_bytes: bytes) -> bytes:
+    print(private_key_bytes)
     private_key_as_num = big_endian_to_int(private_key_bytes)
 
     if private_key_as_num >= N:
@@ -57,6 +58,7 @@ def private_key_to_public_key(private_key_bytes: bytes) -> bytes:
 
     raw_public_key = fast_multiply(G, private_key_as_num)
     public_key_bytes = encode_raw_public_key(raw_public_key)
+    print(public_key_bytes)
     return public_key_bytes
 
 
